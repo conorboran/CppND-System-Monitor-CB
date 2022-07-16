@@ -7,6 +7,7 @@
 #include "process.h"
 #include "processor.h"
 #include "system.h"
+#include "linux_parser.h"
 
 using std::set;
 using std::size_t;
@@ -16,26 +17,77 @@ using std::vector;
 
 You need to properly format the uptime. Refer to the comments mentioned in format. cpp for formatting the uptime.*/
 
-// TODO: Return the system's CPU
-Processor& System::Cpu() { return cpu_; }
+// DONE: Return the system's CPU
+Processor& System::Cpu()
+{
+    return cpu_;
+}
 
-// TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+// DONE: Return a container composed of the system's processes
+vector<Process>& System::Processes()
+{
+    vector<int> pids = LinuxParser::Pids();
+    long int up_time_in = 0;
+    long system_uptime = LinuxParser::UpTime();
 
-// TODO: Return the system's kernel identifier (string)
-std::string System::Kernel() { return string(); }
+    processes_.clear();
+    while(!pids.empty())
+    {
+        Process process;
+        process.SetPid(pids.back());
+        process.SetCommand(LinuxParser::Command(pids.back()));
+        process.SetRam(LinuxParser::Ram(pids.back()));
+        process.SetUser(LinuxParser::User(pids.back()));
+        process.SetUpTime(LinuxParser::UpTime(pids.back()));
+        long total_time = LinuxParser::ActiveJiffies(pids.back()) / sysconf(_SC_CLK_TCK);
+        long seconds = system_uptime - up_time_in;
+        process.SetCpuUtilization(float(total_time) / float(seconds));
 
-// TODO: Return the system's memory utilization
-float System::MemoryUtilization() { return 0.0; }
+        processes_.push_back(process);
+        pids.pop_back();
+    }
+    std::sort(processes_.begin(), processes_.end());
+    return processes_;
+}
 
-// TODO: Return the operating system name
-std::string System::OperatingSystem() { return string(); }
+// DONE: Return the system's kernel identifier (string)
+std::string System::Kernel()
+{
+    std::string kernel = LinuxParser::Kernel();
+    return kernel;
+}
 
-// TODO: Return the number of processes actively running on the system
-int System::RunningProcesses() { return 0; }
+// DONE: Return the system's memory utilization
+float System::MemoryUtilization()
+{
+    float mem_utilization = LinuxParser::MemoryUtilization();
+    return mem_utilization;
+}
 
-// TODO: Return the total number of processes on the system
-int System::TotalProcesses() { return 0; }
+// DONE: Return the operating system name
+std::string System::OperatingSystem()
+{
+    std::string operating_system = LinuxParser::OperatingSystem();
+    return operating_system;
+}
 
-// TODO: Return the number of seconds since the system started running
-long int System::UpTime() { return 0; }
+// DONE: Return the number of processes actively running on the system
+int System::RunningProcesses()
+{
+    int running_processes = LinuxParser::RunningProcesses();
+    return running_processes;
+}
+
+// DONE: Return the total number of processes on the system
+int System::TotalProcesses()
+{
+    int total_processes = LinuxParser::TotalProcesses();
+    return total_processes;
+}
+
+// DONE: Return the number of seconds since the system started running
+long int System::UpTime()
+{
+    long up_time = LinuxParser::UpTime();
+    return up_time;
+}
