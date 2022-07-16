@@ -3,6 +3,10 @@
 // DONE: Return the aggregate CPU utilization
 float Processor::Utilization()
 {
+    /*
+     *  Calculation taken from https://stackoverflow.com/questions/23367857/accurate-calculation-of-cpu-usage-given-in-percentage-in-linux
+     */
+
     std::vector<std::string> cpu = LinuxParser::CpuUtilization();
     long user_time = stol(cpu.at(0));
     long nice_time = stol(cpu.at(1));
