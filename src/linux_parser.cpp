@@ -377,7 +377,7 @@ string LinuxParser::User(int pid)
 // DONE: Read and return the uptime of a process
 long LinuxParser::UpTime(int pid)
 {
-  long up_time = 0.0; //in clock ticks
+  long start_time = 0.0; //in seconds
   int starttime_index = 22;
   string line, stream_in;
   std::ifstream stream(kProcDirectory + std::to_string(pid) + kStatFilename);
@@ -390,8 +390,10 @@ long LinuxParser::UpTime(int pid)
     {
       linestream >> stream_in;
     }
-    up_time = std::stol(stream_in);
+    start_time = std::stol(stream_in) / sysconf(_SC_CLK_TCK); // converted from clock ticks to seconds
   }
 
-  return up_time / sysconf(_SC_CLK_TCK); // divide clock ticks to get seconds
+  long system_up_time = LinuxParser::UpTime();
+  long process_up_time = system_up_time - start_time;
+  return process_up_time; // divide clock ticks to get seconds
 }

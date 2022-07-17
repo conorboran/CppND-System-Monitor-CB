@@ -49,7 +49,7 @@ long int Process::UpTime()
 // TODO: Overload the "less than" comparison operator for Process objects (sorting by cpu utilization)
 bool Process::operator<(Process const& a) const
 {
-    return std::stoi(this->ram_) > std::stoi(a.ram_);
+    return this->cpu_utilization_ > a.cpu_utilization_;
 }
 
 void Process::SetPid(int pid_in)
