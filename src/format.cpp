@@ -17,7 +17,7 @@ string Format::ElapsedTime(long seconds_in)
     std::vector<int> time_ints {hours, minutes, seconds};
     std::vector<string> time_strings {std::to_string(hours), std::to_string(minutes), std::to_string(seconds)};
 
-    for(int i = 0; i < time_ints.size(); i++)
+    for(int i = 0U; i < int(time_ints.size()); i++)
     {
         if(time_ints[i] < 10)
         {
